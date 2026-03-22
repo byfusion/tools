@@ -64,7 +64,7 @@ fi
 
 # Fetch latest release tag via git (no API rate limits)
 echo "Fetching latest release version..."
-LATEST_TAG=$(git ls-remote --tags --sort=-v:refname "${REPO_URL}" "v*" | head -n1 | sed 's/.*refs\/tags\///')
+LATEST_TAG=$(git ls-remote --tags --sort=-v:refname "${REPO_URL}" "v*" | grep -v '\^{}' | head -n1 | sed 's/.*refs\/tags\///')
 if [ -z "${LATEST_TAG}" ]; then
     echo "❌ No release found. Please check https://github.com/byfusion/spectra/releases"
     exit 1
