@@ -53,7 +53,7 @@ fi
 # Clone repository
 if [ -d "${INSTALL_DIR}" ]; then
     echo "Spectra already installed at ${INSTALL_DIR}"
-    read -p "Reinstall? (y/N): " -n 1 -r
+    read -p "Reinstall? (y/N): " -n 1 -r < /dev/tty
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
         rm -rf "${INSTALL_DIR}"
@@ -108,7 +108,7 @@ echo ""
 
 # API Key (required)
 while true; do
-    read -p "Enter your API Key (required): " api_key
+    read -p "Enter your API Key (required): " api_key < /dev/tty
     if [ -n "$api_key" ]; then
         break
     fi
@@ -116,11 +116,11 @@ while true; do
 done
 
 # API Host (optional)
-read -p "API Host [yunwu.ai]: " api_host
+read -p "API Host [yunwu.ai]: " api_host < /dev/tty
 api_host=${api_host:-yunwu.ai}
 
 # ComfyUI Host (optional)
-read -p "ComfyUI Host [http://127.0.0.1:8188]: " comfyui_host
+read -p "ComfyUI Host [http://127.0.0.1:8188]: " comfyui_host < /dev/tty
 comfyui_host=${comfyui_host:-http://127.0.0.1:8188}
 
 # Generate .env file
