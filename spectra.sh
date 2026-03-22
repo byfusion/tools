@@ -4,8 +4,20 @@ set -e
 INSTALL_DIR="${HOME}/.spectra/app"
 CONFIG_FILE="${HOME}/.spectra/config"
 REPO_URL="git@github.com:byfusion/spectra.git"
+DEV_MODE=false
 
-echo "=== Spectra Installation ==="
+# Parse arguments
+for arg in "$@"; do
+    case "${arg}" in
+        --dev) DEV_MODE=true;;
+    esac
+done
+
+if [ "${DEV_MODE}" = true ]; then
+    echo "=== Spectra Installation (dev) ==="
+else
+    echo "=== Spectra Installation ==="
+fi
 
 # Detect OS
 OS="$(uname -s)"
@@ -62,16 +74,20 @@ if [ -d "${INSTALL_DIR}" ]; then
     fi
 fi
 
-# Fetch latest release tag via git (no API rate limits)
-echo "Fetching latest release version..."
-LATEST_TAG=$(git ls-remote --tags --sort=-v:refname "${REPO_URL}" "v*" | grep -v '\^{}' | head -n1 | sed 's/.*refs\/tags\///')
-if [ -z "${LATEST_TAG}" ]; then
-    echo "❌ No release found. Please check https://github.com/byfusion/spectra/releases"
-    exit 1
+if [ "${DEV_MODE}" = true ]; then
+    echo "Installing Spectra (dev, latest commit)..."
+    git clone --depth 1 "${REPO_URL}" "${INSTALL_DIR}"
+else
+    # Fetch latest release tag via git (no API rate limits)
+    echo "Fetching latest release version..."
+    LATEST_TAG=$(git ls-remote --tags --sort=-v:refname "${REPO_URL}" "v*" | grep -v '\^{}' | head -n1 | sed 's/.*refs\/tags\///')
+    if [ -z "${LATEST_TAG}" ]; then
+        echo "❌ No release found. Please check https://github.com/byfusion/spectra/releases"
+        exit 1
+    fi
+    echo "Installing Spectra ${LATEST_TAG}..."
+    git clone --branch "${LATEST_TAG}" --depth 1 "${REPO_URL}" "${INSTALL_DIR}"
 fi
-
-echo "Installing Spectra ${LATEST_TAG}..."
-git clone --branch "${LATEST_TAG}" --depth 1 "${REPO_URL}" "${INSTALL_DIR}"
 
 # Save install path
 mkdir -p "$(dirname "${CONFIG_FILE}")"
