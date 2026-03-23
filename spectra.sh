@@ -49,17 +49,17 @@ if [ "${NODE_VERSION}" -lt 18 ]; then
 fi
 echo "✓ Node.js $(node --version)"
 
-# Check ffmpeg (optional)
-if ! command -v ffmpeg &> /dev/null; then
-    echo "⚠️  ffmpeg not found (optional, for video compression)"
+# Check ffmpeg (required)
+if ! command -v ffmpeg &> /dev/null || ! command -v ffprobe &> /dev/null; then
+    echo "❌ ffmpeg/ffprobe not found. Please install ffmpeg first:"
     if [ "${PLATFORM}" = "Mac" ]; then
-        echo "   Install: brew install ffmpeg"
+        echo "   brew install ffmpeg"
     else
-        echo "   Install: sudo apt-get install ffmpeg"
+        echo "   sudo apt-get install ffmpeg"
     fi
-else
-    echo "✓ ffmpeg $(ffmpeg -version | head -n1 | cut -d' ' -f3)"
+    exit 1
 fi
+echo "✓ ffmpeg $(ffmpeg -version | head -n1 | cut -d' ' -f3)"
 
 
 # Clone repository
