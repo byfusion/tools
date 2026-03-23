@@ -143,10 +143,17 @@ comfyui_host=${comfyui_host:-http://127.0.0.1:8188}
 echo "Generating configuration..."
 cd "${INSTALL_DIR}"
 cp .env.example .env
-sed -i.bak "s/DEFAULT_API_KEY=.*/DEFAULT_API_KEY=${api_key}/" .env
-sed -i.bak "s/YUNWU_HOST=.*/YUNWU_HOST=${api_host}/" .env
-sed -i.bak "s|COMFYUI_HOST=.*|COMFYUI_HOST=${comfyui_host}|" .env
-rm -f .env.bak
+python3 -c "
+import re, sys
+key, host, comfy = sys.argv[1], sys.argv[2], sys.argv[3]
+with open('.env', 'r') as f:
+    content = f.read()
+content = re.sub(r'DEFAULT_API_KEY=.*', 'DEFAULT_API_KEY=' + key, content)
+content = re.sub(r'YUNWU_HOST=.*', 'YUNWU_HOST=' + host, content)
+content = re.sub(r'COMFYUI_HOST=.*', 'COMFYUI_HOST=' + comfy, content)
+with open('.env', 'w') as f:
+    f.write(content)
+" "${api_key}" "${api_host}" "${comfyui_host}"
 echo "✓ Configuration saved"
 
 # Create workspace directory
